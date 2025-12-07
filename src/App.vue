@@ -1,7 +1,12 @@
-<script setup></script>
+<script setup>
+import Header from './components/Header.vue'
+</script>
 
 <template>
-  <h1 class="text-2xl text-slate-700">Pizza Express</h1>
+  <div>
+    <Header></Header>
+    <RouterView />
+  </div>
 </template>
 
 <style scoped></style>
