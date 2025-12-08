@@ -11,6 +11,11 @@ const cijenaPizze = ref(null)
 const odabranaVelicina = ref(null)
 const narucenePizze = ref([])
 
+//v-model
+const prezime = ref('')
+const adresa = ref('')
+const brojTelefona = ref('')
+
 const emit = defineEmits(['close-footer'])
 // functions
 const addPizza = () => {
@@ -25,6 +30,15 @@ const selectSize = (velicina, cijena) => {
   odabranaVelicina.value = velicina
   cijenaPizze.value = cijena
 }
+
+const closeFooter = () => {
+  emit('close-footer')
+  odabranaVelicina.value = null
+  pizzaKolicina.value = 1
+  narucenePizze.value = []
+  cijenaPizze.value = null
+}
+
 const dodajNarudzbu = () => {
   if (odabranaVelicina.value) {
     const nova_stavka = {
@@ -38,7 +52,18 @@ const dodajNarudzbu = () => {
 }
 const removePizza = (index) => {
     narucenePizze.value.splice(index,1)
-}   
+}
+
+const isError = ref(false)
+const errorMessage = ref('')
+
+const naruci = () => {
+  if(!prezime.value && !brojTelefona.value && !adresa.value){
+    isError.value = true;
+    errorMessage.value = 'Unesite sve podatke'
+    
+  }
+}
 
 // computed
 const totalPrice = computed(() => cijenaPizze.value * pizzaKolicina.value)
@@ -51,7 +76,7 @@ const totalPrice = computed(() => cijenaPizze.value * pizzaKolicina.value)
   >
     <button
       class="absolute top-2 right-2 text-slate-300 hover:text-white text-xl font-bold cursor-pointer"
-      @click="$emit('closeFooter')"
+      @click="closeFooter"
     >
       ×
     </button>
@@ -147,6 +172,27 @@ const totalPrice = computed(() => cijenaPizze.value * pizzaKolicina.value)
           <img src="/delete.svg" class="cursor-pointer" @click="removePizza(index)"></img></div>
         </li>
       </ul>
+    </div>
+    <div  v-if="narucenePizze.length" class="max-w-2xl mx-auto mt-5 ">
+        <h3 class="text-lg">Podaci za dostavu: </h3>
+        <div>
+          <form class="flex flex-col gap-4 mt-2 w-1/3" @submit.prevent="naruci()">
+            <div class="flex flex-col gap-2">
+             <label for="">Prezime</label>
+            <input type="text" v-model="prezime" class="py-1 px-2 rounded border border-slate-300 focus:outline-none " placeholder="Unesite prezime"></div>
+            <div class="flex flex-col gap-2">
+             <label for="">Adresa</label>
+            <input type="text" v-model="adresa" class="py-1 px-2 rounded border border-slate-300 focus:outline-none " placeholder="Unesite adresu"></div>
+            <div class="flex flex-col gap-2">
+             <label for="">Broj telefona</label>
+            <input type="tel" v-model="brojTelefona"  class="py-1 px-2 rounded border border-slate-300 focus:outline-none " placeholder="Unesite broj telefona"></div>
+            <button  class="bg-orange-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md shadow-black/40 hover:bg-orange-600 transition-all tracking-wide cursor-pointer  text-center">Naruči</button>
+          </form>
+          <div v-if="isError" class="text-red-500">
+            {{ errorMessage }}
+          </div>
+
+        </div>
     </div>
   </footer>
 </template>
