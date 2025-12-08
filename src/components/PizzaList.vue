@@ -31,6 +31,8 @@ addIcons(
   GiMilkCarton,
 )
 import PizzaDetails from './PizzaDetails.vue'
+import PizzaItem from './PizzaItem.vue'
+import OrderFooter from '../components/OrderFooter.vue'
 
 const ikoneSastojaka = {
   rajčica: 'gi-tomato',
@@ -48,11 +50,13 @@ const ikoneSastojaka = {
 }
 const pizze = ref([])
 const odabrana_pizza = ref(null)
+const emit = defineEmits(['odaberi-pizzu'])
 
 // funkcije
 const odaberiPizzu = (pizza) => {
   odabrana_pizza.value = pizza
   console.log(`Odabrana pizza: ${odabrana_pizza.value}`)
+  emit('odaberi-pizzu', pizza)
 }
 
 const fetchPizze = async () => {
@@ -63,6 +67,9 @@ const fetchPizze = async () => {
   } catch (error) {
     console.error(`Greška pri dohvaćanju podataka ${error}`)
   }
+}
+const closeFooter = () => {
+  odabrana_pizza.value = null
 }
 
 //
@@ -75,54 +82,16 @@ onMounted(() => {
     class="mx-auto bg-linear-to-br min-h-screen p-8 bg-[url('/background.png')] bg-cover bg-center bg-no-repeat"
   >
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div v-for="pizza in pizze" :key="pizza.id" @click="odaberiPizzu(pizza.naziv)">
-        <div
-          class="bg-inherit rounded-xl overflow-hidden"
-          :class="
-            odabrana_pizza === pizza.naziv
-              ? 'border-2 border-amber-500'
-              : 'border-2 border-slate-300'
-          "
-        >
-          <div class="w-full h-48 flex items-center justify-center bg-inherit">
-            <img :src="pizza.slika" :alt="pizza.naziv" class="w-full h-full object-cover" />
-          </div>
-
-          <div class="p-6">
-            <div class="flex items-center space-x-3 mb-4">
-              <h2 class="text-lg font-bold text-orange-500 tracking-wide">{{ pizza.naziv }}</h2>
-
-              <div class="flex space-x-2">
-                <div
-                  v-for="(sastojak, index) in pizza.sastojci"
-                  :key="index"
-                  class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-slate-50 font-semibold text-xs"
-                >
-                  <v-icon :name="ikoneSastojaka[sastojak]"></v-icon>
-                </div>
-              </div>
-            </div>
-
-            <div class="space-y-2">
-              <div class="flex justify-between text-gray-700">
-                <span class="font-medium">Mala</span>
-                <span>€{{ pizza.cijene.mala }}</span>
-              </div>
-
-              <div class="flex justify-between text-gray-700">
-                <span class="font-medium">Srednja</span>
-                <span>€{{ pizza.cijene.srednja }}</span>
-              </div>
-
-              <div class="flex justify-between text-gray-700">
-                <span class="font-medium">Jumbo</span>
-                <span>€{{ pizza.cijene.jumbo }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PizzaItem
+        v-for="pizza in pizze"
+        :key="pizza.id"
+        :pizza="pizza"
+        :odabrana_pizza="odabrana_pizza"
+        :ikoneSastojaka="ikoneSastojaka"
+        @click="odaberiPizzu(pizza)"
+      ></PizzaItem>
       <PizzaDetails></PizzaDetails>
     </div>
+    <OrderFooter :odabrana_pizza="odabrana_pizza" @close-footer="closeFooter" />
   </div>
 </template>
