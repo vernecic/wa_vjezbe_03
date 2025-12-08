@@ -1,29 +1,47 @@
 <script setup>
 import { ref, computed } from 'vue'
-defineProps({
+const props = defineProps({
   odabrana_pizza: {
     type: Object,
     required: true,
   },
 })
-const pizza_kolicina = ref(1)
+const pizzaKolicina = ref(1)
 const cijenaPizze = ref(null)
+const odabranaVelicina = ref(null)
+const narucenePizze = ref([])
 
 const emit = defineEmits(['close-footer'])
 // functions
 const addPizza = () => {
-  pizza_kolicina.value++
+  pizzaKolicina.value++
 }
 const subtractPizza = () => {
-  if (pizza_kolicina.value > 1) {
-    pizza_kolicina.value--
-  } else pizza_kolicina = 1
+  if (pizzaKolicina.value > 1) {
+    pizzaKolicina.value--
+  } else pizzaKolicina = 1
 }
-const selectSize = (cijena) => {
+const selectSize = (velicina, cijena) => {
+  odabranaVelicina.value = velicina
   cijenaPizze.value = cijena
 }
+const dodajNarudzbu = () => {
+  if (odabranaVelicina.value) {
+    const nova_stavka = {
+      naziv: props.odabrana_pizza.naziv,
+      velicina: odabranaVelicina.value,
+      kolicina: pizzaKolicina.value,
+    }
+    narucenePizze.value.push(nova_stavka)
+    console.log('Naručene pizze:', narucenePizze.value)
+  }
+}
+const removePizza = (index) => {
+    narucenePizze.value.splice(index,1)
+}   
 
-const totalPrice = computed(() => cijenaPizze.value * pizza_kolicina.value)
+// computed
+const totalPrice = computed(() => cijenaPizze.value * pizzaKolicina.value)
 </script>
 
 <template>
@@ -69,7 +87,7 @@ const totalPrice = computed(() => cijenaPizze.value * pizza_kolicina.value)
               : 'border-slate-500 bg-slate-600/40'
           "
           class="px-3 py-1 cursor-pointer rounded-lg border hover:bg-orange-500 hover:border-orange-400 hover:text-white transition-all text-sm sm:text-base"
-          @click="selectSize(cijena)"
+          @click="selectSize(velicina, cijena)"
         >
           {{ velicina }} – {{ cijena }}€
         </button>
@@ -87,7 +105,7 @@ const totalPrice = computed(() => cijenaPizze.value * pizza_kolicina.value)
         <div
           class="px-3 py-1 bg-slate-600/40 backdrop-blur-sm rounded-md border border-slate-500 text-sm sm:text-base"
         >
-          {{ pizza_kolicina }}
+          {{ pizzaKolicina }}
         </div>
 
         <button
@@ -98,14 +116,37 @@ const totalPrice = computed(() => cijenaPizze.value * pizza_kolicina.value)
         </button>
       </div>
       <div>
-        Ukupno: <span v-if="totalPrice > 0">{{ totalPrice }}€</span>
+        Ukupno: <span v-if="totalPrice > 0">{{ totalPrice.toFixed(2) }}€</span>
       </div>
 
       <button
         class="bg-orange-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md shadow-black/40 hover:bg-orange-600 transition-all tracking-wide cursor-pointer w-full sm:w-auto text-center"
+        @click="dodajNarudzbu()"
       >
         Dodaj u košaricu
       </button>
+    </div>
+    <div
+      v-if="narucenePizze.length"
+      class="mt-4 max-w-2xl mx-auto max-h-40 overflow-y-auto bg-slate-800/50 backdrop-blur-sm rounded-lg p-3 border border-slate-600"
+    >
+      <h4 class="font-semibold text-lg text-white mb-2">Stavke u košarici:</h4>
+      <ul class="space-y-2">
+        <li
+          v-for="(stavka, index) in narucenePizze"
+          :key="index"
+          class="flex items-center justify-between bg-slate-700/50 rounded-md p-2"
+        >
+          <div class="text-white">
+            {{ stavka.naziv }} ({{ stavka.velicina }}) x{{ stavka.kolicina }}
+          </div>
+          <div class="flex items-center gap-4">
+          <div class="text-orange-400 font-semibold">
+            {{ (props.odabrana_pizza.cijene[stavka.velicina] * stavka.kolicina).toFixed(2) }}€
+          </div>
+          <img src="/delete.svg" class="cursor-pointer" @click="removePizza(index)"></img></div>
+        </li>
+      </ul>
     </div>
   </footer>
 </template>
