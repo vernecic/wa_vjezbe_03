@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 defineProps({
   odabrana_pizza: {
     type: Object,
@@ -7,6 +7,7 @@ defineProps({
   },
 })
 const pizza_kolicina = ref(1)
+const cijenaPizze = ref(null)
 
 const emit = defineEmits(['close-footer'])
 // functions
@@ -16,8 +17,13 @@ const addPizza = () => {
 const subtractPizza = () => {
   if (pizza_kolicina.value > 1) {
     pizza_kolicina.value--
-  } else return
+  } else pizza_kolicina = 1
 }
+const selectSize = (cijena) => {
+  cijenaPizze.value = cijena
+}
+
+const totalPrice = computed(() => cijenaPizze.value * pizza_kolicina.value)
 </script>
 
 <template>
@@ -57,7 +63,13 @@ const subtractPizza = () => {
         <button
           v-for="(cijena, velicina) in odabrana_pizza.cijene"
           :key="velicina"
-          class="px-3 py-1 cursor-pointer rounded-lg border border-slate-500 bg-slate-600/40 hover:bg-orange-500 hover:border-orange-400 hover:text-white transition-all text-sm sm:text-base"
+          :class="
+            cijenaPizze === cijena
+              ? 'border-orange-400 bg-orange-300/40'
+              : 'border-slate-500 bg-slate-600/40'
+          "
+          class="px-3 py-1 cursor-pointer rounded-lg border hover:bg-orange-500 hover:border-orange-400 hover:text-white transition-all text-sm sm:text-base"
+          @click="selectSize(cijena)"
         >
           {{ velicina }} – {{ cijena }}€
         </button>
@@ -84,6 +96,9 @@ const subtractPizza = () => {
         >
           +
         </button>
+      </div>
+      <div>
+        Ukupno: <span v-if="totalPrice > 0">{{ totalPrice }}€</span>
       </div>
 
       <button
