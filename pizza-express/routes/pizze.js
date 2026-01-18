@@ -1,29 +1,31 @@
 import express from "express";
-import { pizze } from "../data/data.js";
+import connectToDatabase from "../db.js";
+import { ObjectId } from "mongodb";
+
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  if (pizze.length === 0 || !pizze) {
-    return res.status(404).json({
-      message: "Nema dostupnih pizza.",
-    });
-  }
+let db = await connectToDatabase();
 
-  res.status(200).json(pizze);
+router.get("/", async (req, res) => {
+  let pizze_collection = db.collection("pizze");
+  let pizze = await pizze_collection.find().toArray();
+
+  res.status(200).send(pizze);
 });
 
-router.get("/:naziv", (req, res) => {
-  const naziv = req.params.naziv;
-  const pizza = pizze.find(
-    (p) => p.naziv.toLowerCase() === naziv.toLowerCase()
-  );
+router.get("/:naziv", async (req, res) => {
+  let pizze_collection = db.collection("pizze");
+  let nazivParam = req.params.naziv;
 
-  if (!pizza) {
-    return res.status(404).json({
-      message: "Pizza nije pronađena.",
+  try {
+    let result = await pizze_collection.findOne({ naziv: nazivParam });
+    res.status(200).json(result);
+  } catch (e) {
+    console.error(e.errorResponse);
+    res.status(400).json({
+      error: e.errorResponse,
     });
   }
-  res.status(200).json(pizza);
 });
 
 export default router;

@@ -24,7 +24,7 @@ const addPizza = () => {
 const subtractPizza = () => {
   if (pizzaKolicina.value > 1) {
     pizzaKolicina.value--
-  } else pizzaKolicina = 1
+  } else pizzaKolicina.value = 1
 }
 const selectSize = (velicina, cijena) => {
   odabranaVelicina.value = velicina
@@ -47,7 +47,6 @@ const dodajNarudzbu = () => {
       kolicina: pizzaKolicina.value,
     }
     narucenePizze.value.push(nova_stavka)
-    console.log('Naručene pizze:', narucenePizze.value)
   }
 }
 const removePizza = (index) => {
@@ -61,7 +60,6 @@ const naruci = () => {
   if(!prezime.value && !brojTelefona.value && !adresa.value){
     isError.value = true;
     errorMessage.value = 'Unesite sve podatke'
-    
   }
 }
 
