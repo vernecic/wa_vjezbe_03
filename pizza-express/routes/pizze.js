@@ -1,16 +1,20 @@
 import express from "express";
 import connectToDatabase from "../db.js";
-import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
 let db = await connectToDatabase();
 
 router.get("/", async (req, res) => {
-  let pizze_collection = db.collection("pizze");
-  let pizze = await pizze_collection.find().toArray();
+  try {
+    let pizze_collection = db.collection("pizze");
+    let pizze = await pizze_collection.find().toArray();
 
-  res.status(200).send(pizze);
+    res.status(200).send(pizze);
+  } catch (e) {
+    console.error(e);
+    res.status(400).json({ error: e.errorResponse });
+  }
 });
 
 router.get("/:naziv", async (req, res) => {
@@ -19,6 +23,11 @@ router.get("/:naziv", async (req, res) => {
 
   try {
     let result = await pizze_collection.findOne({ naziv: nazivParam });
+    if (!result) {
+      res.status(404).json({
+        message: "Pizza ne postoji.",
+      });
+    }
     res.status(200).json(result);
   } catch (e) {
     console.error(e.errorResponse);
