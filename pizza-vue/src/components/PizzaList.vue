@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { addIcons } from 'oh-vue-icons'
 import {
@@ -51,6 +51,7 @@ const ikoneSastojaka = {
 const pizze = ref([])
 const odabrana_pizza = ref(null)
 const emit = defineEmits(['odaberi-pizzu'])
+const pizzaSearch = ref('')
 
 // funkcije
 const odaberiPizzu = (pizza) => {
@@ -58,6 +59,16 @@ const odaberiPizzu = (pizza) => {
   console.log(`Odabrana pizza: ${odabrana_pizza.value}`)
   emit('odaberi-pizzu', pizza)
 }
+
+const pizze_filtrirano = computed(() => {
+  if (!pizzaSearch.value) {
+    return pizze.value
+  } else {
+    return pizze.value.filter((p) =>
+      p.naziv.toLowerCase().includes(pizzaSearch.value.toLowerCase()),
+    )
+  }
+})
 
 const fetchPizze = async () => {
   try {
@@ -81,9 +92,17 @@ onMounted(() => {
   <div
     class="mx-auto bg-linear-to-br min-h-screen p-8 bg-[url('/background.png')] bg-cover bg-center bg-no-repeat"
   >
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div>
+      <input
+        type="text"
+        placeholder="Pretraži pizze"
+        class="py-1 px-2 rounded-lg border border-slate-300 w-[300px] focus:outline-none"
+        v-model="pizzaSearch"
+      />
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-5">
       <PizzaItem
-        v-for="pizza in pizze"
+        v-for="pizza in pizze_filtrirano"
         :key="pizza.id"
         :pizza="pizza"
         :odabrana_pizza="odabrana_pizza"
