@@ -55,11 +55,27 @@ const removePizza = (index) => {
 
 const isError = ref(false)
 const errorMessage = ref('')
+const orderSuccess = ref('')
 
-const naruci = () => {
-  if(!prezime.value && !brojTelefona.value && !adresa.value){
+const naruci = async () => {
+  isError.value = ''
+  errorMessage.value = ''
+  if(!prezime.value || !brojTelefona.value || !adresa.value){
     isError.value = true;
     errorMessage.value = 'Unesite sve podatke'
+    return
+  }
+  try {
+    const narudzba = {
+      prezime: prezime.value,
+      adresa: adresa.value,
+      telefon: brojTelefona.value,
+      narucene_pizze: narucenePizze.value
+    }
+    const res = await axios.post('http://localhost:3000/narudzbe', narudzba)
+    orderSuccess.value = 'Narudžba uspješna'
+  } catch (error){
+    console.log(error)
   }
 }
 
@@ -188,6 +204,9 @@ const totalPrice = computed(() => cijenaPizze.value * pizzaKolicina.value)
           </form>
           <div v-if="isError" class="text-red-500">
             {{ errorMessage }}
+          </div>
+          <div v-if="orderSuccess"> 
+            <p class="font-bold text-green-500">{{ orderSuccess }}</p>
           </div>
 
         </div>
