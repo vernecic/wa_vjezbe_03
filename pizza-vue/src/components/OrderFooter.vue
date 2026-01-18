@@ -87,7 +87,7 @@ const totalPrice = computed(() => cijenaPizze.value * pizzaKolicina.value)
         class="flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left gap-2 w-full sm:w-auto"
       >
         <img
-          :src="odabrana_pizza.slika"
+          :src="odabrana_pizza.slika_url"
           alt="slika ovdje"
           class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover shadow-md shadow-black/40"
         />
@@ -102,7 +102,7 @@ const totalPrice = computed(() => cijenaPizze.value * pizzaKolicina.value)
       <!-- Odabir veličina + cijene -->
       <div class="flex items-center justify-center sm:justify-start flex-wrap gap-2 sm:w- auto">
         <button
-          v-for="(cijena, velicina) in odabrana_pizza.cijene"
+          v-for="(cijena, velicina) in odabrana_pizza.cijena"
           :key="velicina"
           :class="
             cijenaPizze === cijena
@@ -165,7 +165,7 @@ const totalPrice = computed(() => cijenaPizze.value * pizzaKolicina.value)
           </div>
           <div class="flex items-center gap-4">
           <div class="text-orange-400 font-semibold">
-            {{ (props.odabrana_pizza.cijene[stavka.velicina] * stavka.kolicina).toFixed(2) }}€
+            {{ (props.odabrana_pizza.cijena[stavka.velicina] * stavka.kolicina).toFixed(2) }}€
           </div>
           <img src="/delete.svg" class="cursor-pointer" @click="removePizza(index)"></img></div>
         </li>
