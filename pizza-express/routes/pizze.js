@@ -37,4 +37,38 @@ router.get("/:naziv", async (req, res) => {
   }
 });
 
+router.post("/", async (req, res) => {
+  let pizze_collection = db.collection("pizze");
+  let novaPizza = req.body;
+
+  const kljucevi = ["naziv", "cijena", "sastojci", "slika_url"];
+  if (
+    !novaPizza.naziv ||
+    !novaPizza.cijena ||
+    !novaPizza.sastojci ||
+    !novaPizza.slika_url
+  ) {
+    return res.status(400).json({ message: "Potrebni su svi ključevi." });
+  }
+  if (
+    typeof novaPizza.cijena.mala !== "number" ||
+    typeof novaPizza.cijena.srednja !== "number" ||
+    typeof novaPizza.cijena.jumbo !== "number"
+  ) {
+    return res.status(400).json({ message: "Cijena mora biti broj." });
+  }
+  for (let sastojak of novaPizza.sastojci) {
+    if (typeof sastojak !== "string") {
+      return res.status(400).json({ message: "Sastojak mora biti string." });
+    }
+  }
+
+  try {
+    let result = await pizze_collection.insertOne(novaPizza);
+    return res.status(200).json({ inseretedId: result.inseretedId });
+  } catch (e) {
+    console.log(e);
+  }
+});
+
 export default router;
