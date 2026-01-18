@@ -32,7 +32,7 @@ onMounted(() => {
       <div class="flex gap-10">
         <div>
           <div class="w-[600px] h-[400px]">
-            <img :src="pizza.slika" alt="" class="mt-5 w-full h-full object-cover" />
+            <img :src="pizza.slika_url" alt="" class="mt-5 w-full h-full object-cover" />
           </div>
           <h3 class="text-xl font-semibold">Sastojci:</h3>
           <div v-for="sastojak in pizza.sastojci" class="uppercase">
@@ -43,9 +43,9 @@ onMounted(() => {
           <h3 class="mt-5 text-xl font-semibold">Cijene</h3>
           <div class="flex flex-column">
             <ul>
-              <li>Mala: {{ pizza.cijene.mala }}€</li>
-              <li>Srednja: {{ pizza.cijene.srednja }}€</li>
-              <li>Jumbo: {{ pizza.cijene.jumbo }}€</li>
+              <li>Mala: {{ pizza.cijena.mala }}€</li>
+              <li>Srednja: {{ pizza.cijena.srednja }}€</li>
+              <li>Jumbo: {{ pizza.cijena.jumbo }}€</li>
             </ul>
           </div>
         </div>
