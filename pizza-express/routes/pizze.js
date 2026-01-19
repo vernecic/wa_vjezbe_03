@@ -4,13 +4,51 @@ import connectToDatabase from "../db.js";
 const router = express.Router();
 
 let db = await connectToDatabase();
-
+let pizze;
 router.get("/", async (req, res) => {
+  let minPrice = Number(req.query.minPrice);
+  let maxPrice = Number(req.query.maxPrice);
+  let naziv = req.query.naziv;
+  let sortBy = req.query.sortBy;
+
   try {
     let pizze_collection = db.collection("pizze");
-    let pizze = await pizze_collection.find().toArray();
 
-    res.status(200).send(pizze);
+    let pipeline = [];
+    if (naziv) {
+      pipeline.push({
+        $match: {
+          naziv: { $regex: naziv, $options: "i" },
+        },
+      });
+    }
+
+    if (minPrice || maxPrice) {
+      let cijenaFilter = {};
+
+      if (minPrice && !maxPrice) {
+        cijenaFilter["cijena.mala"] = { $gte: minPrice };
+      } else if (maxPrice && !minPrice) {
+        cijenaFilter["cijena.mala"] = { $lte: maxPrice };
+      } else if (maxPrice && minPrice) {
+        cijenaFilter["cijena.mala"] = { $gte: minPrice, $lte: maxPrice };
+      } else cijenaFilter = {};
+      pipeline.push({
+        $match: cijenaFilter,
+      });
+    }
+    if (sortBy === "PRICE_ASC") {
+      pipeline.push({
+        $sort: { "cijena.mala": 1 },
+      });
+    } else if (sortBy === "PRICE_DESC") {
+      pipeline.push({
+        $sort: { "cijena.mala": -1 },
+      });
+    }
+
+    pizze = await pizze_collection.aggregate(pipeline).toArray();
+    res.status(200).json(pizze);
   } catch (e) {
     console.error(e);
     res.status(400).json({ error: e.errorResponse });

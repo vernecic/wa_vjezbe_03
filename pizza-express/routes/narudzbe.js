@@ -23,6 +23,11 @@ router.post("/", async (req, res) => {
       message: "Ključevi se ne podudaraju",
     });
   }
+  if (isNaN(novaNarudzba.telefon)) {
+    return res.status(400).json({
+      message: "Broj telefon mora biti broj.",
+    });
+  }
 
   for (let stavka of novaNarudzba.narucene_pizze) {
     let pizza_kljucevi = Object.keys(stavka);
@@ -50,17 +55,14 @@ router.post("/", async (req, res) => {
     let ukupnaCijenaPizze = cijena * stavka.kolicina;
     ukupnaCijenaNarudzbe += ukupnaCijenaPizze;
   }
-  if (isNaN(novaNarudzba.telefon)) {
-    return res.status(400).json({
-      message: "Broj telefon mora biti broj.",
-    });
-  }
+
   novaNarudzba.ukupna_cijena = ukupnaCijenaNarudzbe;
 
   try {
     let result = await narudzbe_collection.insertOne(novaNarudzba);
     res.status(200).json({
       message: "Narudžba poslana",
+      inseretedId: result.insertedId,
     });
   } catch (error) {
     console.log(error);

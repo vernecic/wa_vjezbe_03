@@ -8,7 +8,7 @@ defineProps({
 
 <template>
   <div
-    class="bg-inherit rounded-xl overflow-hidden"
+    class="bg-inherit rounded-xl overflow-hidden h-fit"
     :class="odabrana_pizza === pizza ? 'border-2 border-amber-500' : 'border-2 border-slate-300'"
   >
     <div class="w-full h-48 flex items-center justify-center bg-inherit">
