@@ -1,11 +1,12 @@
 # wa_vjezbe_03
 
-npm install
+
 
 cd pizza-express
+npm install
 nodemon index.js
 
-cd .
-
+cd ..
 cd pizza-vue
+npm install
 npm run dev
