@@ -1,12 +1,19 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
 
 const isUser = ref(false)
 
-onMounted(() => {
+const checkAuth = () => {
   const token = localStorage.getItem('token')
   isUser.value = !!token
+}
+
+onMounted(() => {
+  checkAuth()
 })
 
 const logout = () => {
@@ -14,6 +21,13 @@ const logout = () => {
   isUser.value = false
   router.push('/prijava')
 }
+
+watch(
+  () => route.path,
+  () => {
+    checkAuth()
+  },
+)
 </script>
 <template>
   <header class="w-full border-b border-slate-200 bg-slate-700 backdrop-blur-sm">
@@ -45,7 +59,10 @@ const logout = () => {
           >Registracija</router-link
         >
       </div>
-      <div v-if="isUser" @click="logout" class="text-white font-semibold">Odjava</div>
+      <div class="flex gap-4 items-center text-white font-semibold" v-if="isUser">
+        <div class="text-white font-semibold cursor-pointer">Moje narudže</div>
+        <div @click="logout" class="font-semibold cursor-pointer text-red-500">Odjava</div>
+      </div>
 
       <div class="hidden text-right text-xs leading-snug text-slate-200 sm:block">
         <div class="font-medium text-slate-200">Negrijeva 6</div>

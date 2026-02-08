@@ -1,11 +1,12 @@
 import express from "express";
 import connectToDatabase from "../db.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 let db = await connectToDatabase();
 
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   let narudzbe_collection = db.collection("narudzbe");
   let pizza_collection = db.collection("pizze");
   let novaNarudzba = req.body;
@@ -56,6 +57,8 @@ router.post("/", async (req, res) => {
     ukupnaCijenaNarudzbe += ukupnaCijenaPizze;
   }
 
+  novaNarudzba.username = req.username;
+  console.log("USERNAME U NARUDŽBI:", req.username);
   novaNarudzba.ukupna_cijena = ukupnaCijenaNarudzbe;
 
   try {
@@ -67,8 +70,23 @@ router.post("/", async (req, res) => {
   } catch (error) {
     console.log(error);
   }
+});
 
-  l;
+router.get("/", authMiddleware, async (req, res) => {
+  try {
+    let narudzbe_collection = db.collection("narudzbe");
+    let narudzbe = await narudzbe_collection
+      .find({
+        username: req.username,
+      })
+      .toArray();
+
+    res.json(narudzbe);
+  } catch (error) {
+    res.status(400).json({
+      message: "Greška pri dohvaćanju narudžbi.",
+    });
+  }
 });
 
 export default router;

@@ -39,20 +39,6 @@ const generateJWT = (payload) => {
   }
 };
 
-export const verifyJWT = (token) => {
-  try {
-    let jwt_secret = process.env.JWT_SECRET;
-    if (!jwt_secret) {
-      throw new Error("Tajni ključ za potpisivanje JWT tokena nije dostupan");
-    }
-    let decoded = jwt.verify(token, jwt_secret);
-    return decoded;
-  } catch (error) {
-    console.error("Došlo je do greške u izradi JWT tokena!", error);
-    return error;
-  }
-};
-
 router.post("/register", async (req, res) => {
   try {
     const { username, password } = req.body;

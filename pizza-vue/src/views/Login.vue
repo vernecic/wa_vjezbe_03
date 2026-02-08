@@ -18,7 +18,7 @@ const login = async () => {
     })
     console.log('Prijava uspješna', res.data)
 
-    localStorage.setItem('token', res.data.token)
+    localStorage.setItem('token', res.data.jwt_token)
 
     router.push('/')
   } catch (error) {
